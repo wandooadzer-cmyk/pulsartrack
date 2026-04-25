@@ -26,11 +26,12 @@ export function SubscriptionStatus({ subscription, onCancel, onRenew }: Subscrip
     );
   }
 
-  const expiresDate = new Date(Number(subscription.expires_at) * 1000);
   const now = Date.now();
-  const daysLeft = Math.max(0, Math.floor((Number(subscription.expires_at) * 1000 - now) / 86400000));
-  const isExpiringSoon = daysLeft <= 7 && daysLeft > 0;
-  const isExpired = daysLeft === 0;
+  const expiresMs = Number(subscription.expires_at) * 1000;
+  const expiresDate = new Date(expiresMs);
+  const isExpired = expiresMs <= now;
+  const daysLeft = isExpired ? 0 : Math.ceil((expiresMs - now) / 86400000);
+  const isExpiringSoon = !isExpired && daysLeft <= 7;
   const tierStyle = TIER_COLORS[subscription.tier] || TIER_COLORS.Starter;
   const pricePaid = (Number(subscription.amount_paid) / 1e7).toFixed(2);
 
