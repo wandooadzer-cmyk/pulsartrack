@@ -115,11 +115,13 @@ fn test_verify_publisher() {
     let pub1 = Address::generate(&env);
     c.register_publisher(&pub1, &s(&env, "example.com"));
     c.submit_kyc(&pub1, &s(&env, "KycHash"), &s(&env, "KycProvider"));
-    c.verify_publisher(&admin, &pub1, &PublisherTier::Gold);
+    c.verify_publisher(&admin, &pub1);
     let p = c.get_publisher(&pub1).unwrap();
     assert!(matches!(p.status, VerificationStatus::Verified));
     assert!(p.verified_at.is_some());
     assert_eq!(p.reputation_score, 100);
+    // Tier should be Bronze for score of 100
+    assert!(matches!(p.tier, PublisherTier::Bronze));
     assert!(c.is_verified(&pub1));
     let kyc = c.get_kyc(&pub1).unwrap();
     assert!(kyc.verified);
@@ -133,7 +135,7 @@ fn test_verify_publisher_unauthorized() {
     let (c, _, _) = setup(&env);
     let pub1 = Address::generate(&env);
     c.register_publisher(&pub1, &s(&env, "example.com"));
-    c.verify_publisher(&Address::generate(&env), &pub1, &PublisherTier::Bronze);
+    c.verify_publisher(&Address::generate(&env), &pub1);
 }
 
 #[test]
@@ -144,7 +146,7 @@ fn test_suspend_publisher() {
     let pub1 = Address::generate(&env);
     c.register_publisher(&pub1, &s(&env, "example.com"));
     c.submit_kyc(&pub1, &s(&env, "KycHash"), &s(&env, "KycProvider"));
-    c.verify_publisher(&admin, &pub1, &PublisherTier::Silver);
+    c.verify_publisher(&admin, &pub1);
     c.suspend_publisher(&admin, &pub1);
     assert!(!c.is_verified(&pub1));
 }
@@ -180,8 +182,8 @@ fn test_record_impression() {
     let pub1 = Address::generate(&env);
     c.register_publisher(&pub1, &s(&env, "example.com"));
     c.submit_kyc(&pub1, &s(&env, "KycHash"), &s(&env, "KycProvider"));
-    c.verify_publisher(&admin, &pub1, &PublisherTier::Gold);
-    c.record_impression(&orchestrator, &pub1, &1000i128);
+    c.verify_publisher(&admin, &pub1);
+    c.record_impression(&caller, &pub1, &1000i128);
     let p = c.get_publisher(&pub1).unwrap();
     assert_eq!(p.total_impressions, 1);
     assert_eq!(p.total_earnings, 1000);

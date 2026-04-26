@@ -15,10 +15,7 @@ build/
 *.tsbuildinfo
 
 # ── Environment files (never commit secrets) ─────────
-.env
-.env.local
 .env.*.local
-.env.production
 backend/.env
 
 # ── Logs & Coverage ──────────────────────────────────────
@@ -32,7 +29,6 @@ coverage/
 .DS_Store
 Thumbs.db
 .idea/
-.vscode/
 *.swp
 *.swo
 
@@ -42,3 +38,4 @@ Thumbs.db
 issue.md
 pr.md
 
+config.bat
